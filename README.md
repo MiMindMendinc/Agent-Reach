@@ -1,7 +1,6 @@
 # Agent Reach — upstream evaluation fork
 
 [![Upstream](https://img.shields.io/badge/upstream-Panniantong%2FAgent--Reach-0969da)](https://github.com/Panniantong/Agent-Reach)
-[![CI](https://github.com/MiMindMendinc/Agent-Reach/actions/workflows/pytest.yml/badge.svg)](https://github.com/MiMindMendinc/Agent-Reach/actions/workflows/pytest.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 [![Python 3.10–3.13](https://img.shields.io/badge/python-3.10--3.13-3776AB.svg)](pyproject.toml)
 
@@ -24,7 +23,7 @@ network. The visibility of this fork cannot be changed independently.
 The fork is kept as a transparent, reproducible evaluation surface:
 
 - the upstream source and attribution remain intact;
-- the included CI runs the upstream test suite on Python 3.10–3.13;
+- the included workflow is configured to run the upstream test suite on Python 3.10–3.13;
 - the wheel gate checks packaging and required skill assets;
 - local portfolio work is not mixed into this repository.
 
