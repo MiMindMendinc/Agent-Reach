@@ -68,3 +68,75 @@ jobs:
           /tmp/smoke/bin/pip install --quiet dist/*.whl
           /tmp/smoke/bin/agent-reach version
           cd /tmp && /tmp/smoke/bin/python -c "import agent_reach; from importlib.resources import files; assert (files('agent_reach')/'skill'/'SKILL.md').is_file(); print('SKILL.md ships in site-packages OK')"
+
+  # Report-only by design. CONTRIBUTING.md asks contributors to run ruff and
+  # mypy, and pyproject.toml configures both and ships them in [dev], but no
+  # workflow has ever enforced them. These jobs make the real state visible
+  # without turning the fork red. They are not gates: every remaining finding
+  # lives in upstream-authored source, and this fork does not edit upstream
+  # source. Promote them to gates only in a repository that owns the code.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c constraints.txt -e .[dev]
+
+      # Annotates the diff in the GitHub UI. Never fails the build.
+      - name: Run ruff (report-only)
+        continue-on-error: true
+        run: ruff check . --output-format=github
+
+      # `ruff format --check` is deliberately NOT run: upstream does not format
+      # with ruff, so it would report ~49 files on an unmodified snapshot and
+      # drown the signal from `ruff check`.
+      - name: Summarize ruff findings
+        if: always()
+        run: |
+          {
+            echo "## ruff check (report-only)"
+            echo
+            echo '```'
+            ruff check . --output-format=concise 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c constraints.txt -e .[dev]
+
+      - name: Run mypy (report-only)
+        continue-on-error: true
+        run: mypy agent_reach
+
+      - name: Summarize mypy findings
+        if: always()
+        run: |
+          {
+            echo "## mypy (report-only)"
+            echo
+            echo '```'
+            mypy agent_reach 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

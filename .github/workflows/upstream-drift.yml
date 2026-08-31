@@ -1,0 +1,115 @@
+# Measures this fork's distance from upstream, and verifies the claim the
+# README makes: that no upstream-owned file has been modified here.
+#
+# Comparing branch tips alone cannot do that -- `git diff upstream/main..HEAD`
+# conflates "this fork edited the file" with "upstream moved on and this fork
+# has not caught up". The merge base separates them:
+#
+#   merge-base..HEAD           -> what THIS FORK changed   (must stay fork-owned)
+#   merge-base..upstream/main  -> what UPSTREAM changed     (how stale we are)
+#
+# This job never fails and never writes to the repository. It reports.
+name: upstream-drift
+
+on:
+  schedule:
+    # Mondays, 06:17 UTC. Off the hour so it is not queued alongside every
+    # other cron job on the runner fleet.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UPSTREAM_URL: https://github.com/Panniantong/Agent-Reach.git
+  UPSTREAM_BRANCH: main
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          # Shallow clones have no merge base with upstream.
+          fetch-depth: 0
+
+      - name: Compare against upstream
+        run: |
+          set -euo pipefail
+
+          git remote add upstream "$UPSTREAM_URL"
+          git fetch --quiet upstream "$UPSTREAM_BRANCH"
+          UP="upstream/$UPSTREAM_BRANCH"
+
+          base=$(git merge-base HEAD "$UP")
+          behind=$(git rev-list --count "HEAD..$UP")
+          ahead=$(git rev-list --count "$UP..HEAD")
+
+          # Files this fork intentionally owns. Divergence here is the point of
+          # the fork, not drift. Keep in sync with README.md's "Boundaries".
+          fork_owned='^(README\.md|FORK_AUDIT\.md|CONTRIBUTING\.md|SECURITY\.md|\.github/|scripts/fork-audit\.sh)'
+
+          fork_changed=$(git diff --name-only "$base..HEAD")
+          # The invariant: nothing outside the fork-owned set may appear here.
+          violations=$(echo "$fork_changed" | grep -Ev "$fork_owned" || true)
+
+          {
+            echo "## Upstream drift"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Upstream | \`Panniantong/Agent-Reach@$UPSTREAM_BRANCH\` |"
+            echo "| Upstream HEAD | \`$(git log -1 --format='%h %s' "$UP")\` |"
+            echo "| Shared base | \`$(git log -1 --format='%h %s' "$base")\` |"
+            echo "| Commits **behind** upstream | **$behind** |"
+            echo "| Fork-only commits | **$ahead** |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "### Upstream source integrity"
+            echo
+            if [ -z "$violations" ]; then
+              echo "PASS - this fork has modified no upstream-owned file."
+              echo
+              echo "Files changed by this fork, all fork-owned:"
+              echo
+              echo '```'
+              echo "${fork_changed:-(none)}"
+              echo '```'
+            else
+              echo "ATTENTION - this fork has modified upstream-owned files."
+              echo
+              echo "README.md states the upstream source remains intact. Either"
+              echo "revert these, or update the README so the claim matches:"
+              echo
+              echo '```'
+              echo "$violations"
+              echo '```'
+            fi
+            echo
+
+            if [ "$behind" -gt 0 ]; then
+              echo "### Staleness"
+              echo
+              echo "$behind upstream commit(s) are not in this fork, touching"
+              echo "$(git diff --name-only "$base..$UP" | wc -l | tr -d ' ') file(s)."
+              echo "The evaluated snapshot is therefore not current upstream."
+              echo
+              echo '```'
+              git log --oneline --no-decorate "HEAD..$UP" | head -50
+              echo '```'
+              if [ "$behind" -gt 50 ]; then
+                echo
+                echo "_(showing the 50 most recent of $behind)_"
+              fi
+            else
+              echo "### Staleness"
+              echo
+              echo "This fork is level with upstream."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "behind=$behind ahead=$ahead violations=$(echo -n "$violations" | grep -c . || true)"

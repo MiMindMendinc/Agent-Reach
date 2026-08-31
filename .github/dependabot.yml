@@ -1,0 +1,15 @@
+# GitHub Actions only, on purpose.
+#
+# Action versions are fork-owned infrastructure, so bumping them is safe here.
+# The pip ecosystem is deliberately NOT enabled: this fork evaluates upstream's
+# dependency set as upstream pins it, and dependency PRs would diverge the very
+# thing under evaluation. Dependency updates belong upstream.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"
+    open-pull-requests-limit: 3
