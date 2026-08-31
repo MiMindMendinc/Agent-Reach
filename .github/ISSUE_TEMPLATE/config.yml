@@ -1,0 +1,14 @@
+# This repository is an evaluation fork. Product bugs, feature requests and
+# support questions belong upstream, where the maintainers and releases are.
+# Routing them here strands the reporter and duplicates upstream's tracker.
+blank_issues_enabled: false
+contact_links:
+  - name: Bug reports, features and support (upstream)
+    url: https://github.com/Panniantong/Agent-Reach/issues
+    about: Agent Reach is maintained upstream by Panniantong. File all product issues there.
+  - name: Report a security vulnerability (upstream)
+    url: https://github.com/Panniantong/Agent-Reach/security/advisories/new
+    about: Use upstream's private advisory flow. Never report a vulnerability in a public issue.
+  - name: Installation and usage documentation (upstream)
+    url: https://github.com/Panniantong/Agent-Reach/blob/main/docs/install.md
+    about: Current install instructions and channel setup guides live upstream.
