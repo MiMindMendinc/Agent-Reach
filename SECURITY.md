@@ -1,3 +1,27 @@
+> **This is an evaluation fork. Report vulnerabilities upstream.**
+>
+> This repository is a public fork of
+> [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) and
+> ships no releases of its own. A vulnerability in Agent Reach affects
+> upstream and every downstream user, so it belongs in upstream's private
+> advisory flow:
+>
+> 👉 **[Report to upstream](https://github.com/Panniantong/Agent-Reach/security/advisories/new)**
+>
+> Two caveats specific to this fork:
+>
+> - This fork can lag upstream. Before reporting, check whether the issue is
+>   already fixed upstream — the `upstream-drift` workflow reports how many
+>   commits behind this snapshot is, and `main` here is not a security-supported
+>   distribution.
+> - If a problem exists **only** in this fork's own files (`README.md`,
+>   `FORK_AUDIT.md`, `.github/`, `scripts/fork-audit.sh`), open a private
+>   advisory on this repository instead.
+>
+> The policy below is upstream's, kept verbatim.
+
+---
+
 # Security Policy
 
 ## Supported Versions

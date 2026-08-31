@@ -1,3 +1,22 @@
+> **This is an evaluation fork — contribute upstream, not here.**
+>
+> Agent Reach is developed and maintained at
+> [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach).
+> Pull requests and issues opened against this fork do not reach the
+> maintainers and will not ship in a release.
+>
+> - Contributing to Agent Reach → [upstream repository](https://github.com/Panniantong/Agent-Reach)
+> - Bugs, features, support → [upstream issues](https://github.com/Panniantong/Agent-Reach/issues)
+> - Changes to this fork's own files (`README.md`, `FORK_AUDIT.md`, `.github/`,
+>   `scripts/fork-audit.sh`) → open a PR here; see
+>   [FORK_AUDIT.md](FORK_AUDIT.md) for how the fork is verified.
+>
+> The guide below is upstream's, kept verbatim because it documents the
+> project's conventions. Read "fork the repository" in it as forking
+> **upstream**, not this fork.
+
+---
+
 # Contributing to Agent Reach
 
 Thank you for your interest in contributing to Agent Reach! This document provides guidelines and instructions for contributing.
