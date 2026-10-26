@@ -58,8 +58,11 @@ python -m pip install --quiet --upgrade pip
 pip install --quiet -c constraints.txt -e ".[dev]"
 
 echo "==> Test suite"
+# GITHUB_TOKEN/GH_TOKEN are cleared: Config.get reads them from the environment,
+# so an exported token makes an upstream test fail for reasons unrelated to this
+# repo (see FORK_AUDIT.md). The record must describe a clean environment.
 set +e
-PYTEST_OUT="$(pytest -q 2>&1)"
+PYTEST_OUT="$(env -u GITHUB_TOKEN -u GH_TOKEN pytest -q 2>&1)"
 PYTEST_RC=$?
 set -e
 echo "$PYTEST_OUT" | tail -5
