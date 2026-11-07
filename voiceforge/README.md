@@ -198,6 +198,6 @@ voiceforge/
 
 ## License
 
-Released under the MIT License. The Kokoro model and the `kokoro-onnx` library
+Released under the MIT License (see `LICENSE`). The Kokoro model and the `kokoro-onnx` library
 are separate projects with their own licenses. Check their repositories before
 you ship a product that uses them.
