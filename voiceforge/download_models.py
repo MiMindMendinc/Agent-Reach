@@ -119,8 +119,9 @@ def download(spec: ModelFile, dest: Path, base_url: str = RELEASE_URL) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Download and verify Kokoro model files for VoiceForge.")
     parser.add_argument("--dir", type=Path, default=BASE_DIR / "models", help="folder for the model files")
-    parser.add_argument("--force", action="store_true", help="download again even if files verify")
-    parser.add_argument("--check", action="store_true", help="only verify existing files; download nothing")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--force", action="store_true", help="download again even if files verify")
+    mode.add_argument("--check", action="store_true", help="only verify existing files; download nothing")
     args = parser.parse_args(argv)
 
     target = args.dir.resolve()

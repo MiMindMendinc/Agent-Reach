@@ -94,3 +94,13 @@ def test_main_replaces_unverified_existing_file_and_keeps_good_one(tmp_path, mon
     assert dm.main(["--dir", str(tmp_path)]) == 0
     assert downloaded == ["b.bin"]
     assert dm.verify(tmp_path / "b.bin", make_spec(good, "b.bin")) is None
+
+
+def test_check_and_force_cannot_be_combined(tmp_path, monkeypatch, capsys):
+    downloaded = []
+    monkeypatch.setattr(dm, "download", lambda spec, dest, base_url=dm.RELEASE_URL: downloaded.append(spec.name))
+    with pytest.raises(SystemExit) as info:
+        dm.main(["--check", "--force", "--dir", str(tmp_path)])
+    assert info.value.code == 2
+    assert "not allowed with argument" in capsys.readouterr().err
+    assert downloaded == []
