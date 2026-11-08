@@ -1,0 +1,12 @@
+{
+  "name": "voiceforge-client",
+  "version": "1.1.0",
+  "description": "JavaScript client for a local VoiceForge text-to-speech server",
+  "type": "module",
+  "main": "voiceforge.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "node --test voiceforge.test.mjs"
+  }
+}
