@@ -84,8 +84,12 @@ class TTSEngine:
         """Load the model. Returns True on success; never raises."""
         missing = self.missing_files()
         if missing:
-            self.error = f"Missing model file(s) in {self.model_dir}: {', '.join(missing)}"
-            log.warning("%s. %s", self.error, MODEL_HELP)
+            # The API shows this message, so it names the fix but not local paths.
+            self.error = (
+                f"Missing model file(s): {', '.join(missing)}. "
+                "Run `python download_models.py` to install them."
+            )
+            log.warning("Model files missing in %s: %s. %s", self.model_dir, ", ".join(missing), MODEL_HELP)
             return False
 
         try:
@@ -98,9 +102,12 @@ class TTSEngine:
             self.error = None
             log.info("Model loaded from %s (%d English voices)", self.model_dir, len(self._voices))
             return True
-        except Exception as exc:  # noqa: BLE001 - report any load failure, do not crash
+        except Exception:  # noqa: BLE001 - report any load failure, do not crash
             self._kokoro = None
-            self.error = f"Failed to load the TTS model: {exc}"
+            self.error = (
+                "The speech model failed to load. Check the server log, or run "
+                "`python download_models.py --check` to verify the model files."
+            )
             log.exception("Failed to load the TTS model")
             return False
 
