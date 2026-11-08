@@ -1,0 +1,82 @@
+name: voiceforge
+
+# Gates for the VoiceForge text-to-speech package in voiceforge/.
+# Unlike the report-only lint and typecheck jobs in pytest.yml, every job here
+# fails the build. No job downloads the Kokoro model: the API is tested with a
+# fake engine, so these runs need no network access beyond package installs.
+
+on:
+  push:
+    paths:
+      - "voiceforge/**"
+      - ".github/workflows/voiceforge.yml"
+  pull_request:
+    paths:
+      - "voiceforge/**"
+      - ".github/workflows/voiceforge.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: voiceforge
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Tests (pytest)
+        run: pytest tests -q
+
+  js-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: JavaScript client tests
+        working-directory: voiceforge/clients/js
+        run: node --test voiceforge.test.mjs
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Audit pinned dependencies for known vulnerabilities
+        working-directory: voiceforge
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r requirements.txt
+          pip-audit -r requirements-dev.txt
