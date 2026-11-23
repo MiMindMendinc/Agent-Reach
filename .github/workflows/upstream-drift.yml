@@ -99,7 +99,7 @@ jobs:
               echo "The evaluated snapshot is therefore not current upstream."
               echo
               echo '```'
-              git log --oneline --no-decorate "HEAD..$UP" | head -50
+              git log --max-count=50 --oneline --no-decorate "HEAD..$UP"
               echo '```'
               if [ "$behind" -gt 50 ]; then
                 echo
